@@ -1,0 +1,172 @@
+---
+title: "3言語による線形回帰係数の推定"
+author: "yaminabeworks"
+date: "2022/04/02"
+output:
+  html_document:
+    toc: TRUE
+    toc_depth: 6
+    toc_float: TRUE
+    number_sections: TRUE
+---
+
+```{css, echo=FALSE}
+.py {
+  background-color: yellowgreen;
+  border: 3px solid green;
+  font-weight: bold;
+}
+.r {
+  background-color: skyblue;
+  border: 3px solid blue;
+  font-weight: bold;
+}
+.jl {
+  background-color: gray;
+  border: 3px solid black;
+  font-weight: bold;
+}
+```
+
+# はじめに
+
+この資料では、線形回帰モデルの回帰係数を`Python`、`R`、`Julia`の3つの言語で推定する方法について紹介する。どの言語でもライブラリを使う方法と、`NumPy`やそれに相当するような機能のみを用いたやり方を紹介している。
+
+# 参考文献
+
+筆者は`Julia`の`DataFrames.jl`や行列計算に関して調べ物が必要だったので、以下のサイトに大変お世話になった。ありがたい。ほかの2つの言語については、別の機会に参考になりそうなものをまとめる。
+
+1. https://zenn.dev/hyrodium/articles/3fa3882e4bca04#2%E3%81%A4%E3%81%AE%E3%83%99%E3%82%AF%E3%83%88%E3%83%AB%E3%81%AE%E7%A9%8D
+
+また、線形回帰に関する話題は線形回帰モデルに関する説明をしているサイト、の欄をみてほしい。説明をみごとにまるごとブン投げてしまっているのでリッジ回帰あたりからはちゃんと書き直したいよねの気持ち。
+
+# 線形回帰モデルに関する説明をしているサイト
+
+ここでは、線形回帰モデルの説明をするとみせかけて参考となるようなサイトを紹介するにとどめる。線形回帰モデルについての説明は2022年4月時点でも素晴らしいものが星の数ほどある状態で、いい参考文献を見つける方が筆者の曖昧な理解から繰り出される怪文書よりもよほどいいと思ったからそうする。
+
+1. https://qiita.com/fujiisoup/items/e7f703fc57e2dfc441ad
+
+# 準備
+
+全ての言語でデータセット`iris`を使うので、`R`から`.csv`にしておく。
+
+```{r class.source="r"}
+write.csv(iris, "iris.csv")
+```
+
+# `R`による回帰係数の推定
+
+`R`による回帰係数の推定は、よく`lm`関数によって行われている。そこで、本資料では下記の2種類の方法で回帰係数を推定してその結果を比較する。
+
+- `lm`関数による推定
+- `R`の行列計算による推定
+
+## `lm`関数による推定
+
+```{r class.source="r"}
+# irisを直接用いる
+model <- lm("Sepal.Width ~ Sepal.Length + Petal.Length", data = iris)
+model$coef
+```
+
+## `R`の行列計算による推定
+
+`my_coef`は、`model$coef`と誤差などの情報以外は同じ結果であることがわかる。
+
+```{r class.source="r"}
+# データの処理はなるべくtidyverseを用いることにした。
+library(tidyverse)
+X0 <- iris %>% select(Sepal.Length, Petal.Length)
+intercept <- rep(1, dim(X0)[1])
+X <- cbind(intercept, X0) %>% as.matrix()
+y <- iris %>% select(Sepal.Width) %>% as.matrix()
+my_coef <- solve(t(X)%*%X)%*%t(X)%*%y
+my_coef
+```
+
+# `Python`による推定
+
+`Python`による回帰係数の推定は、ライブラリの`sklearn`か`statsmodels`によって行われている。この2つのライブラリによる推定結果を比較すると、`statsmodels`のほうが推定に関する情報を多く記録してくれるという印象がある。そのため、本資料では下記の2種類の方法で回帰係数を推定してその結果を比較する。
+
+- ライブラリ`statsmodels`による推定
+- `NumPy`の行列計算による推定
+
+## ライブラリ`statsmodels`による推定
+
+推定結果`model.params`は、`my_coef`や`model$coef`と誤差を除けば同じになっている。
+
+```{python class.source="py"}
+# インポート
+import statsmodels.api as sm
+# データirisをインポートする
+iris = sm.datasets.get_rdataset("iris", "datasets").data
+# 説明変数の行列Xと被説明変数のベクトルyを作る
+X = iris[["Sepal.Length", "Petal.Length"]]
+y = iris["Sepal.Width"]
+# sm.add_constant(X)は、定数項部分の1をXに加えたもの。
+model = sm.OLS(y, sm.add_constant(X)).fit()
+# 係数をとってきたい場合、paramsメソッドを用いる。
+model.params
+```
+
+## `NumPy`の行列計算による推定
+
+推定結果`coef`は、いままで行ってきた推定結果に一致しているように見える。
+
+```{python class.source="py"}
+# インポート
+import numpy as np
+import statsmodels.api as sm
+# データirisをインポートする
+iris = sm.datasets.get_rdataset("iris", "datasets").data
+# 説明変数の行列Xと被説明変数のベクトルyを作る
+# sm.add_constant(X)と同じことをするためにiris["const"]を追加
+iris["const"] = 1
+X = iris[["const", "Sepal.Length", "Petal.Length"]].values
+y = iris["Sepal.Width"].values
+# 演算子@で内積をとり、np.linalg.solveで引数1の逆行列を引数2にかけたものを計算できる。
+# 下の書き方は速度面に配慮した記法で、次の記事を参考にした。
+# https://qiita.com/fujiisoup/items/e7f703fc57e2dfc441ad
+coef = np.linalg.solve(X.T @ X, X.T @ y)
+coef
+```
+
+# `Julia`による推定
+
+`Julia`による回帰係数の推定は、ライブラリの`GLM`が用意している`lm`関数によって行われることが多いようだ。そこで、本資料では下記の2種類の方法で回帰係数を推定してその結果を比較する。
+
+- パッケージ`GLM`の`lm`関数による推定
+- パッケージ`LinearAlgebra`の行列計算による推定
+
+# パッケージ`GLM`による推定
+
+値はいままで推定してきた結果とほとんど変わらないことがわかる。
+
+```{julia class.source="jl"}
+# インポート
+using RDatasets
+using GLM
+# RDataSetsからirisをロードする
+df = dataset("datasets", "iris");
+model = lm(@formula(SepalWidth ~ SepalLength + PetalLength), df);
+GLM.coef(model)
+```
+
+# パッケージ`LinearAlgebra`を使った行列計算による推定
+
+`LinearAlgebra`による回帰係数の推定を行い、ほかの値と比較して差がないことを確認している。
+
+```{julia class.source="jl"}
+# インポート
+using RDatasets
+using DataFrames
+using LinearAlgebra
+# RDataSetsからirisをロードする
+df = dataset("datasets", "iris");
+df[!, :const] = [1 for i = 1:size(df)[1]];
+X = Matrix(df[:, [:const, :SepalLength, :PetalLength]]);
+y = df[:, :SepalWidth];
+# 行列計算を行う。
+coef = inv(transpose(X) * X)* transpose(X) * y;
+coef
+```
