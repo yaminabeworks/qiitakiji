@@ -1544,26 +1544,21 @@ div.tocify {
 <div id="線形回帰モデルに関する説明をしているサイト" class="section level1" number="3">
 <h1><span class="header-section-number">3</span>
 線形回帰モデルに関する説明をしているサイト</h1>
-<p>ここでは、線形回帰モデルの説明をするとみせかけて参考となるようなサイトを紹介するにとどめる。線形回帰モデルについての説明は2022年4月時点でも素晴らしいものが星の数ほどある状態で、いい参考文献を見つける方が筆者の曖昧な理解から繰り出される怪文書よりもよほどいいと思ったからそうする。</p>
+<p>ここでは、線形回帰モデルの説明をするとみせかけて参考となるようなサイトを紹介するにとどめる。線形回帰モデルについての説明は2022年4月時点でも素晴らしいものが星の数ほどある状態で、いい参考文献を紹介する方が筆者の曖昧な理解から繰り出される怪文書よりもよほどいいと思ったからそうする。</p>
 <ol style="list-style-type: decimal">
 <li><a href="https://qiita.com/fujiisoup/items/e7f703fc57e2dfc441ad" class="uri">https://qiita.com/fujiisoup/items/e7f703fc57e2dfc441ad</a></li>
 </ol>
 </div>
-<div id="準備" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> 準備</h1>
-<p>全ての言語でデータセット<code>iris</code>を使うので、<code>R</code>から<code>.csv</code>にしておく。</p>
-<pre class="r r"><code>write.csv(iris, &quot;iris.csv&quot;)</code></pre>
-</div>
-<div id="rによる回帰係数の推定" class="section level1" number="5">
-<h1><span class="header-section-number">5</span>
+<div id="rによる回帰係数の推定" class="section level1" number="4">
+<h1><span class="header-section-number">4</span>
 <code>R</code>による回帰係数の推定</h1>
 <p><code>R</code>による回帰係数の推定は、よく<code>lm</code>関数によって行われている。そこで、本資料では下記の2種類の方法で回帰係数を推定してその結果を比較する。</p>
 <ul>
 <li><code>lm</code>関数による推定</li>
 <li><code>R</code>の行列計算による推定</li>
 </ul>
-<div id="lm関数による推定" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span>
+<div id="lm関数による推定" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span>
 <code>lm</code>関数による推定</h2>
 <pre class="r r"><code># irisを直接用いる
 model &lt;- lm(&quot;Sepal.Width ~ Sepal.Length + Petal.Length&quot;, data = iris)
@@ -1571,8 +1566,8 @@ model$coef</code></pre>
 <pre><code>##  (Intercept) Sepal.Length Petal.Length 
 ##    1.0380691    0.5611860   -0.3352667</code></pre>
 </div>
-<div id="rの行列計算による推定" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span>
+<div id="rの行列計算による推定" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span>
 <code>R</code>の行列計算による推定</h2>
 <p><code>my_coef</code>は、<code>model$coef</code>と誤差などの情報以外は同じ結果であることがわかる。</p>
 <pre class="r r"><code># データの処理はなるべくtidyverseを用いることにした。
@@ -1597,16 +1592,16 @@ my_coef</code></pre>
 ## Petal.Length  -0.3352667</code></pre>
 </div>
 </div>
-<div id="pythonによる推定" class="section level1" number="6">
-<h1><span class="header-section-number">6</span>
+<div id="pythonによる推定" class="section level1" number="5">
+<h1><span class="header-section-number">5</span>
 <code>Python</code>による推定</h1>
 <p><code>Python</code>による回帰係数の推定は、ライブラリの<code>sklearn</code>か<code>statsmodels</code>によって行われている。この2つのライブラリによる推定結果を比較すると、<code>statsmodels</code>のほうが推定に関する情報を多く記録してくれるという印象がある。そのため、本資料では下記の2種類の方法で回帰係数を推定してその結果を比較する。</p>
 <ul>
 <li>ライブラリ<code>statsmodels</code>による推定</li>
 <li><code>NumPy</code>の行列計算による推定</li>
 </ul>
-<div id="ライブラリstatsmodelsによる推定" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span>
+<div id="ライブラリstatsmodelsによる推定" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span>
 ライブラリ<code>statsmodels</code>による推定</h2>
 <p>推定結果<code>model.params</code>は、<code>my_coef</code>や<code>model$coef</code>と誤差を除けば同じになっている。</p>
 <pre class="python py"><code># インポート
@@ -1627,8 +1622,8 @@ model = sm.OLS(y, sm.add_constant(X)).fit()
 ## Petal.Length   -0.335267
 ## dtype: float64</code></pre>
 </div>
-<div id="numpyの行列計算による推定" class="section level2" number="6.2">
-<h2><span class="header-section-number">6.2</span>
+<div id="numpyの行列計算による推定" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span>
 <code>NumPy</code>の行列計算による推定</h2>
 <p>推定結果<code>coef</code>は、いままで行ってきた推定結果に一致しているように見える。</p>
 <pre class="python py"><code># インポート
@@ -1649,8 +1644,8 @@ coef</code></pre>
 <pre><code>## array([ 1.03806906,  0.56118597, -0.33526674])</code></pre>
 </div>
 </div>
-<div id="juliaによる推定" class="section level1" number="7">
-<h1><span class="header-section-number">7</span>
+<div id="juliaによる推定" class="section level1" number="6">
+<h1><span class="header-section-number">6</span>
 <code>Julia</code>による推定</h1>
 <p><code>Julia</code>による回帰係数の推定は、ライブラリの<code>GLM</code>が用意している<code>lm</code>関数によって行われることが多いようだ。そこで、本資料では下記の2種類の方法で回帰係数を推定してその結果を比較する。</p>
 <ul>
@@ -1658,8 +1653,8 @@ coef</code></pre>
 <li>パッケージ<code>LinearAlgebra</code>の行列計算による推定</li>
 </ul>
 </div>
-<div id="パッケージglmによる推定" class="section level1" number="8">
-<h1><span class="header-section-number">8</span>
+<div id="パッケージglmによる推定" class="section level1" number="7">
+<h1><span class="header-section-number">7</span>
 パッケージ<code>GLM</code>による推定</h1>
 <p>値はいままで推定してきた結果とほとんど変わらないことがわかる。</p>
 <pre class="julia jl"><code># インポート
@@ -1674,8 +1669,8 @@ GLM.coef(model)</code></pre>
 ##   0.5611859710980439
 ##  -0.33526674157885833</code></pre>
 </div>
-<div id="パッケージlinearalgebraを使った行列計算による推定" class="section level1" number="9">
-<h1><span class="header-section-number">9</span>
+<div id="パッケージlinearalgebraを使った行列計算による推定" class="section level1" number="8">
+<h1><span class="header-section-number">8</span>
 パッケージ<code>LinearAlgebra</code>を使った行列計算による推定</h1>
 <p><code>LinearAlgebra</code>による回帰係数の推定を行い、ほかの値と比較して差がないことを確認している。</p>
 <pre class="julia jl"><code># インポート
