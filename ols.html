@@ -1613,10 +1613,8 @@ X = iris[[&quot;Sepal.Length&quot;, &quot;Petal.Length&quot;]]
 y = iris[&quot;Sepal.Width&quot;]
 # sm.add_constant(X)は、定数項部分の1をXに加えたもの。
 model = sm.OLS(y, sm.add_constant(X)).fit()
-# 係数をとってきたい場合、paramsメソッドを用いる。</code></pre>
-<pre><code>## C:\Users\katsu\ANACON~1\lib\site-packages\statsmodels\tsa\tsatools.py:142: FutureWarning: In a future version of pandas all arguments of concat except for the argument &#39;objs&#39; will be keyword-only
-##   x = pd.concat(x[::order], 1)</code></pre>
-<pre class="python py"><code>model.params</code></pre>
+# 係数をとってきたい場合、paramsメソッドを用いる。
+model.params</code></pre>
 <pre><code>## const           1.038069
 ## Sepal.Length    0.561186
 ## Petal.Length   -0.335267

@@ -28,6 +28,15 @@ output:
 }
 ```
 
+```{r class.source="r", echo=FALSE}
+options(warn=-1)
+```
+
+```{python class.source="py", echo=FALSE}
+import warnings
+warnings.simplefilter('ignore')
+```
+
 # はじめに
 
 この資料では、線形回帰モデルの回帰係数を`Python`、`R`、`Julia`の3つの言語で推定する方法について紹介する。どの言語でもライブラリを使う方法と、`NumPy`やそれに相当するような機能のみを用いたやり方を紹介している。
